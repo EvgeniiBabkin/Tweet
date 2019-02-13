@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="following_hint">Читает</string>
+    <string name="followers_hint">Читатели</string>
+    <string name="fa_map_marker">\uf041</string>
+    <string name="fa_heart_o">\uf08a</string>
+    <string name="fa_retweet">\uf079</string>
+    <string name="search_hint">search hint</string>
+    <string name="search_query_hint">search query hint</string>
+    <string name="ion_search">\uf079</string>
+
+
+</resources>
