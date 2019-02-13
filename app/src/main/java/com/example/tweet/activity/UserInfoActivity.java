@@ -3,11 +3,15 @@ package com.example.tweet.activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.view.ViewCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,6 +42,8 @@ public class UserInfoActivity extends AppCompatActivity {
 
     private RecyclerView tweetsRecyclerView;
     private TweetAdapter tweetAdapter;
+
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     private HttpClient httpClient;
 
@@ -77,6 +83,8 @@ public class UserInfoActivity extends AppCompatActivity {
         followersCountTextView = findViewById(R.id.followers_count_text_view);
         toolbar = findViewById(R.id.toolbar);
 
+        swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
+
         setSupportActionBar(toolbar);
 
         initRecyclerView();
@@ -90,6 +98,9 @@ public class UserInfoActivity extends AppCompatActivity {
 
     private void initRecyclerView(){
         tweetsRecyclerView = findViewById(R.id.tweets_recycler_view);
+        ViewCompat.setNestedScrollingEnabled(tweetsRecyclerView, false);
+
+        tweetsRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         tweetsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         tweetAdapter = new TweetAdapter();
