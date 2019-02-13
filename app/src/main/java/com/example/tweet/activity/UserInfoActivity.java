@@ -135,7 +135,14 @@ public class UserInfoActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Collection<Tweet> tweets) {
-            tweetAdapter.setItems(tweets);
+
+
+            if (tweets != null) {
+                tweetAdapter.setItems(tweets);
+            }
+            else {
+            Toast.makeText(UserInfoActivity.this, "произошла ошибка!", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -156,7 +163,14 @@ public class UserInfoActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(User s) {
-            displayUserInfo(s);
+
+            if (s != null){
+                displayUserInfo(s);
+            }
+            else {
+                Toast.makeText(UserInfoActivity.this, "произошла ошибка!", Toast.LENGTH_SHORT).show();
+            }
+
         }
     }
 }

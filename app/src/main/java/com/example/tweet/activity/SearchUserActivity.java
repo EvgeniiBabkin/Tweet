@@ -132,8 +132,14 @@ public class SearchUserActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Collection<User> users) {
-            usersAdapter.clearItem();
-            usersAdapter.setItems(users);
+
+            if (users != null) {
+                usersAdapter.clearItem();
+                usersAdapter.setItems(users);
+            }
+            else {
+            Toast.makeText(SearchUserActivity.this, "произошла ошибка!", Toast.LENGTH_SHORT).show();
+            }
         }
 
 
