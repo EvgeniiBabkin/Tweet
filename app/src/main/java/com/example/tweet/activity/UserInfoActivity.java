@@ -47,6 +47,8 @@ public class UserInfoActivity extends AppCompatActivity {
 
     private HttpClient httpClient;
 
+    private int taskInProgressCount = 0;
+
     private android.support.v7.widget.Toolbar toolbar;
 
 
@@ -72,7 +74,7 @@ public class UserInfoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_info);
 
-        long userId = getIntent().getLongExtra(USER_ID, -1);
+        final long userId = getIntent().getLongExtra(USER_ID, -1);
 
         userImageView = findViewById(R.id.user_image_view);
         nameTextView = findViewById(R.id.user_name_text_view);
@@ -84,6 +86,15 @@ public class UserInfoActivity extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
 
         swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+
+                tweetAdapter.clearItem();
+                loadUserInfo(userId);
+                loadTweets(userId);
+            }
+        });
 
         setSupportActionBar(toolbar);
 
@@ -133,6 +144,11 @@ public class UserInfoActivity extends AppCompatActivity {
     private class TweetsAsyncTask extends AsyncTask<Long, Integer, Collection<Tweet>>{
 
         @Override
+        protected void onPreExecute() {
+            setRefreshLayoutVisible(true);
+        }
+
+        @Override
         protected Collection<Tweet> doInBackground(Long... longs) {
 
             try {
@@ -147,6 +163,7 @@ public class UserInfoActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Collection<Tweet> tweets) {
 
+            setRefreshLayoutVisible(false);
 
             if (tweets != null) {
                 tweetAdapter.setItems(tweets);
@@ -159,6 +176,11 @@ public class UserInfoActivity extends AppCompatActivity {
 
     private class UserInfoAsyncTask extends AsyncTask<Long, Integer, User>{
 
+
+        @Override
+        protected void onPreExecute() {
+            setRefreshLayoutVisible(true);
+        }
 
         @Override
         protected User doInBackground(Long... longs) {
@@ -175,6 +197,7 @@ public class UserInfoActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(User s) {
 
+            setRefreshLayoutVisible(false);
             if (s != null){
                 displayUserInfo(s);
             }
@@ -182,6 +205,16 @@ public class UserInfoActivity extends AppCompatActivity {
                 Toast.makeText(UserInfoActivity.this, "произошла ошибка!", Toast.LENGTH_SHORT).show();
             }
 
+        }
+    }
+
+    private void setRefreshLayoutVisible(boolean visible){
+        if (visible) {
+            taskInProgressCount++;
+            if (taskInProgressCount == 1) swipeRefreshLayout.setRefreshing(true);
+        } else {
+            taskInProgressCount--;
+            if (taskInProgressCount == 0) swipeRefreshLayout.setRefreshing(false);
         }
     }
 }
