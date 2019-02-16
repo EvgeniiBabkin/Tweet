@@ -2,85 +2,41 @@ package com.example.tweet.network;
 
 import com.example.tweet.pojo.Tweet;
 import com.example.tweet.pojo.User;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 
 public class JsonParser {
 
-    public Collection<User> getUsers(String response) throws JSONException {
+    private static final Gson GSON = new GsonBuilder().registerTypeAdapter(Tweet.class, new TweetDeserializer()).create();
 
-        JSONArray jsonArray = new JSONArray(response);
-        Collection<User> usersResult = new ArrayList<>();
+    public Collection<User> getUsers(String response){
 
-        for (int i = 0; i <jsonArray.length(); i++){
-            JSONObject usersJson = jsonArray.getJSONObject(i);
+        Type usersType = new TypeToken<Collection<User>>(){}.getType();
 
-            User user = getUser(usersJson);
-            usersResult.add(user);
-        }
-
-        return usersResult;
+        return GSON.fromJson(response, usersType);
     }
 
-    public Collection<Tweet> getTweets (String response) throws JSONException {
+    public Collection<Tweet> getTweets (String response){
 
-        JSONArray jsonArray = new JSONArray(response);
-        Collection<Tweet> tweetsResult = new ArrayList<>();
+        Type tweetsType = new TypeToken<Collection<Tweet>>(){}.getType();
 
-        for (int i = 0; i < jsonArray.length(); i++){
-            JSONObject tweetJson = jsonArray.getJSONObject(i);
-
-            long id = tweetJson.getLong("id");
-            String creationDate = tweetJson.getString("created_at");
-            String fullText = tweetJson.getString("full_text");
-            long retweetCount = tweetJson.getLong("retweet_count");
-            long likesCount = tweetJson.getLong("favorite_count");
-
-            String imgeUrl = getTweetImageUrl(tweetJson);
-
-            JSONObject userJson = tweetJson.getJSONObject("user");
-
-            User user = getUser(userJson);
-
-            Tweet tweet = new Tweet(user, id, creationDate, fullText, retweetCount, likesCount, imgeUrl);
-            tweetsResult.add(tweet);
-        }
-        return tweetsResult;
-    }
-
-    private String getTweetImageUrl(JSONObject tweetJson) throws JSONException {
-
-        JSONObject entities = tweetJson.getJSONObject("entities");
-        JSONArray mediaArray;
-
-        mediaArray =  entities.has("media") ? entities.getJSONArray("media") : null;
-        JSONObject firstMedia = (mediaArray != null) ? mediaArray.getJSONObject(0) : null;
-
-        return firstMedia != null ? firstMedia.getString("media_url") : null;
-    }
-
-    private User getUser(JSONObject userJson) throws JSONException {
-        long id = userJson.getLong("id");
-        String name = userJson.getString("name");
-        String nick = userJson.getString("screen_name");
-        String location = userJson.getString("location");
-        String description = userJson.getString("description");
-        String imageUrl = userJson.getString("profile_image_url");
-        int followersCount = userJson.getInt("followers_count");
-        int followingCount = userJson.getInt("favourites_count");
-
-        return new User(id, imageUrl, name, nick, description, location, followingCount, followersCount);
+        return GSON.fromJson(response, tweetsType);
     }
 
 
-    public User getUser(String response) throws JSONException {
-        JSONObject jsonObject = new JSONObject(response);
-        return getUser(jsonObject);
+
+    public User getUser(String response){
+
+        return GSON.fromJson(response, User.class);
 
     }
 }

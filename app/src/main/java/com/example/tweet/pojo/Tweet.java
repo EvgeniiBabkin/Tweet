@@ -1,25 +1,34 @@
 package com.example.tweet.pojo;
 
 
+import com.google.gson.annotations.SerializedName;
+
 public class Tweet {
 
+    @SerializedName("user")
     private User user;
-    private Long id;
-    private String creationDate;
-    private String text;
-    private Long retweetCount;
-    private Long favouriteCount;
-    private String imageUrl;
 
-    public Tweet(User user, Long id, String creationDate, String text, Long retweetCount, Long favouriteCount, String imageUrl) {
-        this.user = user;
-        this.id = id;
-        this.creationDate = creationDate;
-        this.text = text;
-        this.retweetCount = retweetCount;
-        this.favouriteCount = favouriteCount;
+    @SerializedName("id")
+    private Long id;
+
+    @SerializedName("created_at")
+    private String creationDate;
+
+    @SerializedName("full_text")
+    private String text;
+
+    @SerializedName("retweet_count")
+    private Long retweetCount;
+
+    @SerializedName("favorite_count")
+    private Long favouriteCount;
+
+    public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
+
+    private String imageUrl;
+
 
     public User getUser() {
         return user;
