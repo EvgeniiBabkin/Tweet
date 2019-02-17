@@ -3,8 +3,10 @@ package com.example.tweet.activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -37,12 +39,13 @@ public class SearchUserActivity extends AppCompatActivity {
     private EditText queryEditText;
     private Button searchButton;
 
+    private SwipeRefreshLayout swipeRefreshLayout;
+
     private HttpClient httpClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_search_user);
 
         initRecyclerView();
@@ -69,6 +72,13 @@ public class SearchUserActivity extends AppCompatActivity {
             }
         });
 
+        swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                searchUsers();
+            }
+        });
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -89,6 +99,7 @@ public class SearchUserActivity extends AppCompatActivity {
     private void initRecyclerView() {
         usersRecyclerView = findViewById(R.id.users_recycler_view);
         usersRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        usersRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
         UsersAdapter.OnUserClickListener onUserClickListener = new UsersAdapter.OnUserClickListener() {
             @Override
@@ -117,6 +128,11 @@ public class SearchUserActivity extends AppCompatActivity {
     private class UsersAsyncTask extends AsyncTask<String, Integer, Collection<User>>{
 
         @Override
+        protected void onPreExecute() {
+            swipeRefreshLayout.setRefreshing(true);
+        }
+
+        @Override
         protected Collection<User> doInBackground(String... strings) {
 
             String query = strings[0];
@@ -132,6 +148,8 @@ public class SearchUserActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Collection<User> users) {
+
+            swipeRefreshLayout.setRefreshing(false);
 
             if (users != null) {
                 usersAdapter.clearItem();

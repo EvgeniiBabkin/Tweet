@@ -21,12 +21,12 @@
         <TextView
             android:id="@+id/user_name_text_view"
             style="@style/TextView.Primary.Bold"
-            android:text="Devcolibri"/>
+            android:text="Name"/>
 
         <TextView
             android:id="@+id/user_nick_text_view"
             style="@style/TextView.Secondary"
-            android:text="devcolibri"/>
+            android:text="Nick"/>
 
     </LinearLayout>
 

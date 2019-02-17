@@ -3,11 +3,15 @@ package com.example.tweet.activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.view.ViewCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,7 +43,11 @@ public class UserInfoActivity extends AppCompatActivity {
     private RecyclerView tweetsRecyclerView;
     private TweetAdapter tweetAdapter;
 
+    private SwipeRefreshLayout swipeRefreshLayout;
+
     private HttpClient httpClient;
+
+    private int taskInProgressCount = 0;
 
     private android.support.v7.widget.Toolbar toolbar;
 
@@ -66,7 +74,7 @@ public class UserInfoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_info);
 
-        long userId = getIntent().getLongExtra(USER_ID, -1);
+        final long userId = getIntent().getLongExtra(USER_ID, -1);
 
         userImageView = findViewById(R.id.user_image_view);
         nameTextView = findViewById(R.id.user_name_text_view);
@@ -76,6 +84,17 @@ public class UserInfoActivity extends AppCompatActivity {
         followingCountTextView = findViewById(R.id.following_count_text_view);
         followersCountTextView = findViewById(R.id.followers_count_text_view);
         toolbar = findViewById(R.id.toolbar);
+
+        swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+
+                tweetAdapter.clearItem();
+                loadUserInfo(userId);
+                loadTweets(userId);
+            }
+        });
 
         setSupportActionBar(toolbar);
 
@@ -90,6 +109,9 @@ public class UserInfoActivity extends AppCompatActivity {
 
     private void initRecyclerView(){
         tweetsRecyclerView = findViewById(R.id.tweets_recycler_view);
+        ViewCompat.setNestedScrollingEnabled(tweetsRecyclerView, false);
+
+        tweetsRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         tweetsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         tweetAdapter = new TweetAdapter();
@@ -122,6 +144,11 @@ public class UserInfoActivity extends AppCompatActivity {
     private class TweetsAsyncTask extends AsyncTask<Long, Integer, Collection<Tweet>>{
 
         @Override
+        protected void onPreExecute() {
+            setRefreshLayoutVisible(true);
+        }
+
+        @Override
         protected Collection<Tweet> doInBackground(Long... longs) {
 
             try {
@@ -136,6 +163,7 @@ public class UserInfoActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Collection<Tweet> tweets) {
 
+            setRefreshLayoutVisible(false);
 
             if (tweets != null) {
                 tweetAdapter.setItems(tweets);
@@ -148,6 +176,11 @@ public class UserInfoActivity extends AppCompatActivity {
 
     private class UserInfoAsyncTask extends AsyncTask<Long, Integer, User>{
 
+
+        @Override
+        protected void onPreExecute() {
+            setRefreshLayoutVisible(true);
+        }
 
         @Override
         protected User doInBackground(Long... longs) {
@@ -164,6 +197,7 @@ public class UserInfoActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(User s) {
 
+            setRefreshLayoutVisible(false);
             if (s != null){
                 displayUserInfo(s);
             }
@@ -171,6 +205,16 @@ public class UserInfoActivity extends AppCompatActivity {
                 Toast.makeText(UserInfoActivity.this, "произошла ошибка!", Toast.LENGTH_SHORT).show();
             }
 
+        }
+    }
+
+    private void setRefreshLayoutVisible(boolean visible){
+        if (visible) {
+            taskInProgressCount++;
+            if (taskInProgressCount == 1) swipeRefreshLayout.setRefreshing(true);
+        } else {
+            taskInProgressCount--;
+            if (taskInProgressCount == 0) swipeRefreshLayout.setRefreshing(false);
         }
     }
 }
