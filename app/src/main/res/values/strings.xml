@@ -6,10 +6,10 @@
     <string name="fa_heart_o">\uf08a</string>
     <string name="fa_retweet">\uf079</string>
     <string name="search_hint">search hint</string>
-    <string name="search_query_hint">search query hint</string>
+    <string name="search_query_hint">Введите имя</string>
     <string name="ion_search">\uf079</string>
 
-    <string name="com.twitter.sdk.android.CONSUMER_KEY">uRJ8JebdrBVByRIUQoJgXOEOu</string>
-    <string name="com.twitter.sdk.android.CONSUMER_SECRET">O7V535sxWcXPRXG9PFwg6y54c3T1t83oLbXTq0EVrRsrBoa4PL</string>
+    <string name="com.twitter.sdk.android.CONSUMER_KEY">CONSUMER_KEY</string>
+    <string name="com.twitter.sdk.android.CONSUMER_SECRET">CONSUMER_SECRET</string>
 
 </resources>
